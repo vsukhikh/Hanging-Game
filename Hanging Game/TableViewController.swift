@@ -9,6 +9,24 @@ import UIKit
 
 class TableViewController: UITableViewController {
     var words = ["RHYTHM", "AVENUE", "AXIOM", "CYCLE", "CRYPT", "PUPPY", "GOSSIP", "MATRIX", "SUBWAY", "FUNNY", "STAFF", "QUEUE", "JELLY", "BUFFALO", "GALAXY"]
+    
+    var userWords = Array(repeating: "", count: 15)
+    
+    override func viewWillAppear(_ animated: Bool) {
+        let defaults = UserDefaults.standard
+        
+        if let savedData = defaults.object(forKey: "userWords") as? Data {
+            let jsonDecoder = JSONDecoder()
+            
+            do {
+                userWords = try jsonDecoder.decode([String].self, from: savedData)
+            } catch {
+                print("Failed to load words.")
+            }
+        }
+        
+        tableView.reloadData()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -16,7 +34,7 @@ class TableViewController: UITableViewController {
         title = "Hanging Game"
         navigationController?.navigationBar.prefersLargeTitles = true
     }
-    
+
     func changeTitleOfWord(_ word: String) -> String {
         var str = ""
         for _ in word {
@@ -34,7 +52,12 @@ class TableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Word", for: indexPath)
-        cell.textLabel?.text = "\(indexPath.row + 1). " + changeTitleOfWord(words[indexPath.row])
+        
+        if userWords[indexPath.row] != "" {
+            cell.textLabel?.text = "\(indexPath.row + 1). " + userWords[indexPath.row]
+        } else {
+            cell.textLabel?.text = "\(indexPath.row + 1). " + changeTitleOfWord(words[indexPath.row])
+        }
         return cell
     }
     
@@ -42,18 +65,8 @@ class TableViewController: UITableViewController {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "Game") as? GameViewController {
             vc.answer = words[indexPath.row]
             vc.indexPath = indexPath
+            vc.userWords = userWords
             navigationController?.pushViewController(vc, animated: true)
         }
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }

@@ -23,6 +23,8 @@ class GameViewController: UIViewController {
         }
     }
     
+    var userWords: [String]?
+    
     override func loadView() {
         view = UIView()
         view.backgroundColor = .systemBackground
@@ -130,6 +132,9 @@ class GameViewController: UIViewController {
                 }))
                 present(ac, animated: true)
                 
+                userWords![indexPath!.row] = currentAnswer.text ?? answer!
+                save()
+                
                 hideAllButtons()
             }
         } else {
@@ -139,6 +144,9 @@ class GameViewController: UIViewController {
                 _ = self.navigationController?.popViewController(animated: true)
             }))
             present(ac, animated: true)
+            
+            userWords![indexPath!.row] = currentAnswer.text ?? answer!
+            save()
             
             hideAllButtons()
         }
@@ -167,6 +175,18 @@ class GameViewController: UIViewController {
     func unhideAllButtons() {
         for button in letterButtons {
             button.isHidden = false
+        }
+    }
+    
+    // MARK: - Save to User Defaults
+    func save() {
+        let jsonEncoder = JSONEncoder()
+        
+        if let savedData = try? jsonEncoder.encode(userWords) {
+            let defaults = UserDefaults.standard
+            defaults.set(savedData, forKey: "userWords")
+        } else {
+            print("Failed to save words.")
         }
     }
 
