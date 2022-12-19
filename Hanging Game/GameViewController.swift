@@ -110,7 +110,9 @@ class GameViewController: UIViewController {
         guard let buttonTitle = sender.titleLabel?.text else { return }
         
         activatedButtons.append(sender)
-        sender.isHidden = true
+        UIView.animate(withDuration: 0.1) {
+            sender.alpha = 0
+        }
         
         for (index, letter) in letters.enumerated() {
             if buttonTitle == String(letter) {
@@ -168,13 +170,15 @@ class GameViewController: UIViewController {
     
     func hideAllButtons() {
         for button in letterButtons {
-            button.isHidden = true
+            button.alpha = 0
+            button.isEnabled = false
         }
     }
     
     func unhideAllButtons() {
         for button in letterButtons {
-            button.isHidden = false
+            button.isEnabled = true
+            button.alpha = 1
         }
     }
     
